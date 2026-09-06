@@ -1,0 +1,29 @@
+te_symbol,region,us_ticker,name,etf_direction,structure,liq_tier,expense,spot_alternative,notes
+EURUSD,Major,FXE,Invesco CurrencyShares Euro Trust,long EUR,grantor-trust,C,0.40%,EUR.USD,Only surviving major-currency ETF set
+GBPUSD,Major,FXB,Invesco CurrencyShares British Pound Trust,long GBP,grantor-trust,D,0.40%,GBP.USD,
+AUDUSD,Major,FXA,Invesco CurrencyShares Australian Dollar Trust,long AUD,grantor-trust,D,0.40%,AUD.USD,
+USDJPY,Major,FXY,Invesco CurrencyShares Japanese Yen Trust,long JPY,grantor-trust,C,0.40%,USD.JPY,ETF is inverse of the TE quote - sign flip required
+USDCHF,Major,FXF,Invesco CurrencyShares Swiss Franc Trust,long CHF,grantor-trust,D,0.40%,USD.CHF,ETF is inverse of TE quote
+USDCAD,Major,FXC,Invesco CurrencyShares Canadian Dollar Trust,long CAD,grantor-trust,D,0.40%,USD.CAD,ETF is inverse of TE quote
+DXY,Major,UUP,Invesco DB US Dollar Index Bullish Fund,long USD,LP-K1,B,0.77%,DX futures,K-1 ISSUER. Highest fee in the set
+DXY,Major,UDN,Invesco DB US Dollar Index Bearish Fund,short USD,LP-K1,D,0.77%,DX futures,K-1 ISSUER
+NZDUSD,Major,,,,,,,NZD.USD,No US-listed NZD ETF has ever existed
+USDCNY,Major,,,,,,,USD.CNH,CYB and FXCH both liquidated 2020
+USDSEK,Major,,,,,,,USD.SEK,FXS liquidated 2020
+USDSGD,Major,,,,,,,USD.SGD,FXSG liquidated 2020
+USDNOK,Major,,,,,,,USD.NOK,No wrapper
+USDMXN,Major,,,,,,,USD.MXN,No wrapper
+USDBRL,America,,,,,,,USD.BRL,No wrapper
+USDZAR,Africa,,,,,,,USD.ZAR,No wrapper
+USDKRW,Asia,,,,,,,NDF only,Non-deliverable; not accessible retail
+USDINR,Asia,,,,,,,NDF only,Non-deliverable
+USDTRY,Europe,,,,,,,USD.TRY,Available spot at some brokers; extreme carry
+USDPLN,Europe,,,,,,,USD.PLN,
+USDCZK,Europe,,,,,,,USD.CZK,
+USDHUF,Europe,,,,,,,USD.HUF,
+USDDKK,Europe,,,,,,,USD.DKK,EUR-pegged; near-zero independent vol
+USDHKD,Asia,,,,,,,USD.HKD,USD-pegged; unusable for trend
+USDSAR,Asia,,,,,,,,USD-pegged
+USDAED,Asia,,,,,,,,USD-pegged
+EM basket,All,,,,,,,,CEW WisdomTree Emerging Currency liquidated
+All other,All,,,,,,,,~110 remaining TE pairs: no ETF and no retail spot access

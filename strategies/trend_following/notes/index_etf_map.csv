@@ -1,0 +1,79 @@
+te_symbol,index_name,continent,country,us_etf,etf_name,match,liq_tier,ucits_alt,notes
+US500,S&P 500,America,United States,SPY,SPDR S&P 500 ETF Trust,exact,A,CSPX,IVV/VOO cheaper; SPY best for liquidity
+US30,Dow Jones Industrial Average,America,United States,DIA,SPDR Dow Jones Industrial Average ETF,exact,A,,Price-weighted; poor risk proxy for US large cap
+US100,Nasdaq 100,America,United States,QQQ,Invesco QQQ Trust,exact,A,EQQQ,QQQM same index lower fee
+US1000,Russell 1000,America,United States,IWB,iShares Russell 1000 ETF,exact,B,,~93% overlap with SPY
+TSX,S&P/TSX Composite,America,Canada,EWC,iShares MSCI Canada ETF,proxy,B,,Exact tracker is TSX-listed XIC/ZCN
+IBOVESPA,Ibovespa,America,Brazil,EWZ,iShares MSCI Brazil ETF,proxy,A,,Most liquid single-country EM ETF
+IPC,IPC Mexico,America,Mexico,EWW,iShares MSCI Mexico ETF,proxy,B,,
+Merval,S&P Merval,America,Argentina,ARGT,Global X MSCI Argentina ETF,proxy,C,,Heavy ADR weight; poor index tracking
+IGPA,IGPA,America,Chile,ECH,iShares MSCI Chile ETF,proxy,C,,
+COLCAP,COLCAP,America,Colombia,GXG,Global X MSCI Colombia ETF,proxy,D,,iShares ICOL liquidated Aug 2022; verify GXG still active
+Ecuador General,Ecuador General,America,Ecuador,,,none,,,
+IBC,IBC,America,Venezuela,,,none,,,Sanctions; no investable vehicle
+BVPSI,BVPSI,America,Panama,,,none,,,
+BSX,BSX,America,Bermuda,,,none,,,
+JSE,JSE Index,America,Jamaica,,,none,,,
+EU50,Euro Stoxx 50,Europe,Euro Area,FEZ,SPDR Euro Stoxx 50 ETF,exact,B,,Cleanest pan-Europe exposure in US wrapper
+EU350,S&P Europe 350,Europe,Europe,IEV,iShares Europe ETF,exact,B,,Includes UK/CH; broader than FEZ
+EU600,STOXX Europe 600,Europe,Europe,,,none,,MEUD,No US tracker; VGK is FTSE Dev Europe (close proxy)
+EU100,Euronext 100,Europe,Europe,,,none,,,
+GB100,FTSE 100,Europe,United Kingdom,EWU,iShares MSCI United Kingdom ETF,proxy,B,ISF,ISF is exact FTSE 100 tracker
+DE40,DAX,Europe,Germany,EWG,iShares MSCI Germany ETF,proxy,B,EXS1,EXS1/DAXEX exact DAX
+FR40,CAC 40,Europe,France,EWQ,iShares MSCI France ETF,proxy,C,CAC,
+IT40,FTSE MIB,Europe,Italy,EWI,iShares MSCI Italy ETF,proxy,C,,
+ES35,IBEX 35,Europe,Spain,EWP,iShares MSCI Spain ETF,proxy,C,,
+CH20,SMI,Europe,Switzerland,EWL,iShares MSCI Switzerland ETF,proxy,B,CHSPI,Both ~50% Nestle/Roche/Novartis
+NL30,AEX,Europe,Netherlands,EWN,iShares MSCI Netherlands ETF,proxy,C,,ASML dominates both
+Stockholm 30,OMX Stockholm 30,Europe,Sweden,EWD,iShares MSCI Sweden ETF,proxy,C,,
+BE20,BEL 20,Europe,Belgium,EWK,iShares MSCI Belgium ETF,proxy,D,,
+Oslo,OBX,Europe,Norway,ENOR,iShares MSCI Norway ETF,proxy,D,,Sub-$100m AUM; wide spreads
+ATX,ATX,Europe,Austria,EWO,iShares MSCI Austria ETF,proxy,D,,
+Copenhagen,OMX Copenhagen 25,Europe,Denmark,EDEN,iShares MSCI Denmark ETF,proxy,D,,Novo Nordisk concentration risk
+Helsinki 25,OMX Helsinki 25,Europe,Finland,EFNL,iShares MSCI Finland ETF,proxy,D,,
+ISEQ,ISEQ Overall,Europe,Ireland,EIRL,iShares MSCI Ireland ETF,proxy,D,,
+Athens General,Athens General Composite,Europe,Greece,GREK,Global X MSCI Greece ETF,proxy,C,,
+WIG,WIG,Europe,Poland,EPOL,iShares MSCI Poland ETF,proxy,C,,
+BIST 100,BIST 100,Europe,Turkey,TUR,iShares MSCI Turkey ETF,proxy,C,,Local index is nominal; TRY debasement distorts momentum
+MOEX,MOEX Russia,Europe,Russia,,,none,,,ERUS liquidated post-2022 sanctions; uninvestable
+Euro Stoxx Banks,Euro Stoxx Banks,Europe,Euro Area,EUFN,iShares MSCI Europe Financials ETF,proxy,C,,Broader Europe incl UK/CH; not eurozone banks only
+DE Mid,MDAX,Europe,Germany,,,none,,,
+DE Small,SDAX,Europe,Germany,,,none,,,
+PSI,PSI 20,Europe,Portugal,,,none,,,
+PX,PX,Europe,Czech Republic,,,none,,,
+BET,BET,Europe,Romania,,,none,,,
+BUX,BUX,Europe,Hungary,,,none,,,
+Other EU frontier,"SAX/LuxX/CROBEX/SOFIX/SBITOP/BELEX/Vilnius/Tallinn/Riga/ICEX/MBI/MSE/Monex/SASX/CSE/PFTS",Europe,Various,,,none,,,No ETF wrapper of any domicile
+JP225,Nikkei 225,Asia,Japan,EWJ,iShares MSCI Japan ETF,proxy,A,IJPA,MAXIS NKY delisted 2016; DXJ for FX-hedged
+CSI 300,CSI 300,Asia,China,ASHR,Xtrackers Harvest CSI 300 China A ETF,exact,B,,Direct A-share access
+SHANGHAI,SSE Composite,Asia,China,,,none,,,MCHI/FXI/KBA are proxies on different universes
+SHANGHAI 50,SSE 50,Asia,China,KBA,KraneShares MSCI China A 50 Connect ETF,proxy,C,,Different constituent set
+CH50,FTSE China A50,Asia,China,,,none,,,SGX A50 futures are the direct instrument
+NIFTY 50,Nifty 50,Asia,India,INDY,iShares India 50 ETF,exact,C,,Direct Nifty tracker
+SENSEX,BSE Sensex,Asia,India,INDA,iShares MSCI India ETF,proxy,A,,INDA far more liquid than INDY
+TSI,TAIEX,Asia,Taiwan,EWT,iShares MSCI Taiwan ETF,proxy,A,,TSMC ~30% of both
+HK50,Hang Seng,Asia,Hong Kong,EWH,iShares MSCI Hong Kong ETF,poor,B,,EWH is HK-domiciled cos; HSI is now majority mainland. Use MCHI/FXI instead
+STI,Straits Times Index,Asia,Singapore,EWS,iShares MSCI Singapore ETF,proxy,C,,SGX-listed ES3/G3B are exact and avoid US situs
+FKLCI,FTSE Bursa Malaysia KLCI,Asia,Malaysia,EWM,iShares MSCI Malaysia ETF,proxy,C,,
+SET 50,SET 50,Asia,Thailand,THD,iShares MSCI Thailand ETF,proxy,C,,
+JCI,Jakarta Composite,Asia,Indonesia,EIDO,iShares MSCI Indonesia ETF,proxy,C,,IDX (VanEck) is the alternative
+PSEi,PSEi Composite,Asia,Philippines,EPHE,iShares MSCI Philippines ETF,proxy,D,,
+VN,VN Index,Asia,Vietnam,VNM,VanEck Vietnam ETF,proxy,C,,Frontier classification; capacity constrained
+TA-125,TA-125,Asia,Israel,EIS,iShares MSCI Israel ETF,proxy,D,,
+TASI,Tadawul All Share,Asia,Saudi Arabia,KSA,iShares MSCI Saudi Arabia ETF,proxy,C,,
+ADX General,ADX General,Asia,UAE,UAE,iShares MSCI UAE ETF,proxy,D,,Very thin
+DFM General,DFM General,Asia,UAE,UAE,iShares MSCI UAE ETF,poor,D,,ADX and DFM are separate exchanges
+QE,QE Index,Asia,Qatar,QAT,iShares MSCI Qatar ETF,proxy,D,,Very thin
+KSE 100,KSE 100,Asia,Pakistan,,,none,,,Global X PAK liquidated
+HNX,HNX Index,Asia,Vietnam,,,none,,,VNM covers HOSE not HNX
+Other Asia frontier,"DSE Broad/KASE/MSM 30/ASPI/Blom/ASE/LSX/MSE 20/Kuwait/Estirad",Asia,Various,,,none,,,No ETF wrapper
+JPVIX,Nikkei VI,Asia,Japan,,,none,,,Vol index; not directly investable
+ASX200,S&P/ASX 200,Oceania,Australia,EWA,iShares MSCI Australia ETF,proxy,B,,ASX-listed IOZ/STW are exact
+NZX 50,S&P/NZX 50,Oceania,New Zealand,ENZL,iShares MSCI New Zealand ETF,proxy,D,,
+ASX All Share,S&P/ASX All Ordinaries,Oceania,Australia,,,none,,,
+AU50,S&P/ASX 50,Oceania,Australia,,,none,,,
+SAALL,FTSE/JSE All Share,Africa,South Africa,EZA,iShares MSCI South Africa ETF,proxy,C,,
+SA40,FTSE/JSE Top 40,Africa,South Africa,EZA,iShares MSCI South Africa ETF,proxy,C,,Same ETF as SAALL
+EGX 30,EGX 30,Africa,Egypt,,,none,,,VanEck EGPT liquidated; verify
+NSE All Share,NSE All Share,Africa,Nigeria,,,none,,,Global X NGE liquidated 2021
+Other Africa,"CFG 25/Nairobi/DSEI/TUN/GGSECI/SEMDEX/USE/NSX/Gaborone/ZSI",Africa,Various,,,none,,,No ETF wrapper

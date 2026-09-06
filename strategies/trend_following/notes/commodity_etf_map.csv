@@ -1,0 +1,63 @@
+te_symbol,sector,us_ticker,name,structure,match,liq_tier,notes
+Crude Oil,Energy,USO,United States Oil Fund LP,LP-K1,proxy,A,Front-month WTI; severe contango decay. K-1 ISSUER
+Crude Oil,Energy,OILK,ProShares K-1 Free Crude Oil Strategy ETF,1940Act-no-K1,proxy,C,Same exposure as USO without K-1; thinner
+Crude Oil,Energy,USL,United States 12 Month Oil Fund LP,LP-K1,proxy,D,Laddered curve reduces roll drag. K-1 ISSUER
+Brent,Energy,BNO,United States Brent Oil Fund LP,LP-K1,proxy,C,K-1 ISSUER
+Natural gas,Energy,UNG,United States Natural Gas Fund LP,LP-K1,poor,A,Extreme contango; -20%/yr structural drag. K-1 ISSUER. No K-1-free alternative exists
+Gasoline,Energy,UGA,United States Gasoline Fund LP,LP-K1,proxy,D,Only vehicle. K-1 ISSUER
+Heating Oil,Energy,UHN,United States Diesel-Heating Oil Fund LP,LP-K1,proxy,D,VERIFY still active. K-1 ISSUER
+Uranium,Energy,URA,Global X Uranium ETF,1940Act,poor,B,Miners not spot; equity beta dominates
+Uranium,Energy,SRUUF,Sprott Physical Uranium Trust,CA-trust,proxy,C,Closest to spot; OTC in US
+Coal,Energy,,,,none,,KOL delisted 2020
+Coking Coal,Energy,,,,none,,
+EU Gas,Energy,,,,none,,TTF futures via broker only
+UK Gas,Energy,,,,none,,
+German Gas,Energy,,,,none,,
+LNG JKM,Energy,,,,none,,
+Ethanol,Energy,,,,none,,
+Naphtha,Energy,,,,none,,
+Propane,Energy,,,,none,,
+Methanol,Energy,,,,none,,
+Urals Oil,Energy,,,,none,,Sanctioned
+Gold,Metals,GLD,SPDR Gold Shares,grantor-trust,exact,A,No K-1. GLDM/IAU cheaper
+Silver,Metals,SLV,iShares Silver Trust,grantor-trust,exact,A,No K-1. SIVR cheaper
+Platinum,Metals,PPLT,abrdn Physical Platinum Shares ETF,grantor-trust,exact,C,No K-1. Physically backed
+Palladium,Metals,PALL,abrdn Physical Palladium Shares ETF,grantor-trust,exact,D,No K-1. Thin; ~30% annualised vol
+Copper,Metals,CPER,United States Copper Index Fund LP,LP-K1,proxy,C,K-1 ISSUER. No K-1-free copper futures ETF exists
+Copper,Metals,COPX,Global X Copper Miners ETF,1940Act,poor,B,Equity beta; ~0.6 corr to copper spot
+Steel,Metals,SLX,VanEck Steel ETF,1940Act,poor,D,Miners not spot
+Lithium,Metals,LIT,Global X Lithium & Battery Tech ETF,1940Act,poor,B,Equities; poor spot proxy
+Iron Ore,Metals,,,,none,,SGX iron ore futures are the direct instrument
+Rhodium,Metals,,,,none,,
+Cobalt,Metals,,,,none,,
+Aluminum,Metals,,,,none,,LME only
+Zinc,Metals,,,,none,,LME only
+Nickel,Metals,,,,none,,LME only
+Lead,Metals,,,,none,,LME only
+Tin,Metals,,,,none,,LME only
+Other metals,Metals,,,,none,,Silicon/Titanium/Molybdenum/Neodymium/Gallium/Germanium/Indium/Manganese/Tellurium/Magnesium: no wrapper
+Corn,Agricultural,CORN,Teucrium Corn Fund,LP-K1,exact,C,K-1 ISSUER - already excluded
+Wheat,Agricultural,WEAT,Teucrium Wheat Fund,LP-K1,exact,C,K-1 ISSUER - already excluded
+Soybeans,Agricultural,SOYB,Teucrium Soybean Fund,LP-K1,exact,D,K-1 ISSUER - already excluded
+Sugar,Agricultural,CANE,Teucrium Sugar Fund,LP-K1,exact,D,K-1 ISSUER - already excluded
+Ag basket,Agricultural,TILL,Teucrium Agricultural Strategy No K-1 ETF,1940Act-no-K1,proxy,D,Current holding. Corn/wheat/soy/sugar composite
+Coffee,Agricultural,JO,iPath Series B Bloomberg Coffee Subindex ETN,ETN,proxy,D,ETN = Barclays credit risk. VERIFY still listed
+Cocoa,Agricultural,NIB,iPath Bloomberg Cocoa Subindex ETN,ETN,proxy,D,VERIFY - many iPath ag ETNs delisted
+Cotton,Agricultural,BAL,iPath Bloomberg Cotton Subindex ETN,ETN,proxy,D,VERIFY - likely delisted
+Other ags,Agricultural,,,,none,,Lumber/PalmOil/Cheese/Milk/Rubber/OJ/Rice/Canola/Oat/Wool/Tea/SunflowerOil/Rapeseed/Barley/Butter: no wrapper
+Live Cattle,Livestock,,,,none,,COW ETN delisted 2020
+Feeder Cattle,Livestock,,,,none,,
+Lean Hogs,Livestock,,,,none,,
+Other livestock,Livestock,,,,none,,Beef/Poultry/Eggs/Salmon: no wrapper
+GSCI,Index,GSG,iShares S&P GSCI Commodity-Indexed Trust,LP-K1,exact,C,K-1 ISSUER
+GSCI,Index,COMT,iShares GSCI Commodity Dynamic Roll Strategy ETF,1940Act-no-K1,proxy,C,No K-1; optimised roll
+Broad commodity,Index,DBC,Invesco DB Commodity Index Tracking Fund,LP-K1,exact,B,Current holding. K-1 ISSUER
+Broad commodity,Index,PDBC,Invesco Optimum Yield Diversified Commodity No K-1 ETF,1940Act-no-K1,proxy,A,Direct no-K-1 swap for DBC; larger and more liquid
+Broad commodity,Index,BCI,abrdn Bloomberg All Commodity Strategy K-1 Free ETF,1940Act-no-K1,proxy,C,Cheaper than PDBC; BCOM benchmark
+Broad commodity,Index,FTGC,First Trust Global Tactical Commodity Strategy Fund,1940Act-no-K1,proxy,C,Actively managed
+CRB Index,Index,,,,none,,No direct CRB tracker
+EU Carbon Permits,Index,KRBN,KraneShares Global Carbon Strategy ETF,1940Act-no-K1,proxy,C,EUA-heavy; genuinely uncorrelated sleeve
+Containerized Freight,Index,BDRY,Breakwave Dry Bulk Shipping ETF,LP-K1,poor,D,Dry bulk freight futures not container. K-1 ISSUER
+Energy indices,Index,,,,none,,Wind/Nuclear/Solar TE indices are equity baskets; ICLN/TAN/NLR are equity ETFs
+SSE Commodity Index,Index,,,,none,,
+Electricity,Electricity,,,,none,,UK/DE/FR/IT/ES power: no retail wrapper anywhere

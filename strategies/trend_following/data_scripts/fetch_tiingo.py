@@ -1,0 +1,241 @@
+"""
+Tiingo end-of-day fetcher.
+
+Location:  trend_following/data/scripts/fetch_tiingo.py
+Output:    trend_following/data/<TICKER>.parquet
+           trend_following/data/panel.parquet
+Config:    trend_following/.env
+
+Stores raw OHLCV alongside adjusted OHLCV and the corporate-action columns
+(divCash, splitFactor) so adjustments stay reproducible: you can always
+rebuild an adjusted series from the raw one, but not the reverse.
+
+Setup:
+    pip install requests pandas pyarrow python-dotenv
+
+    # trend_following/.env
+    TIINGO_API_KEY=your_key_here
+
+Usage:
+    python fetch_tiingo.py              # incremental update
+    python fetch_tiingo.py --full       # force full refetch
+    python fetch_tiingo.py --tickers GLD SLV
+"""
+
+from __future__ import annotations
+
+import argparse
+import logging
+import os
+import time
+from datetime import date, timedelta
+from pathlib import Path
+
+import pandas as pd
+import requests
+from dotenv import load_dotenv
+
+log = logging.getLogger("tiingo")
+
+# --- paths ----------------------------------------------------------------
+# this file:  <root>/data/scripts/fetch_tiingo.py
+#   parents[0] = <root>/data/scripts
+#   parents[1] = <root>/data
+#   parents[2] = <root>
+DATA_DIR = Path(__file__).resolve().parents[1]
+ROOT_DIR = Path(__file__).resolve().parents[2]
+ENV_PATH = ROOT_DIR / ".env"
+
+# --- config ---------------------------------------------------------------
+
+BASE_URL = "https://api.tiingo.com/tiingo/daily"
+START_DATE = "2004-01-01"          # before the earliest inception in the universe
+PACING_SECONDS = 1.0               # free tier: 50 req/hr, 1000/day. Nowhere near.
+TIMEOUT = 30
+
+UNIVERSE = [
+    "GLD",    # gold, physical
+    "SLV",    # silver, physical
+    "CPER",   # copper
+    "USL",    # WTI, 12-month strip
+    "UGA",    # gasoline
+    "UNL",    # natural gas, 12-month strip
+    "CORN",
+    "WEAT",
+    "SOYB",
+    "CANE",   # sugar
+    "KRBN",   # carbon allowances
+]
+
+COLUMNS = [
+    "open", "high", "low", "close", "volume",
+    "adjOpen", "adjHigh", "adjLow", "adjClose", "adjVolume",
+    "divCash", "splitFactor",
+]
+
+
+# --- credentials ----------------------------------------------------------
+
+
+def load_token() -> str:
+    """Read TIINGO_API_KEY, preferring an already-exported shell variable.
+
+    load_dotenv is given an explicit path rather than relying on its upward
+    search, which starts from the current working directory and therefore
+    breaks whenever the script is invoked from somewhere other than the root.
+    """
+    if ENV_PATH.exists():
+        load_dotenv(ENV_PATH)
+        log.debug("loaded %s", ENV_PATH)
+    else:
+        log.warning("no .env found at %s", ENV_PATH)
+
+    token = os.environ.get("TIINGO_API_KEY")
+    if not token:
+        raise SystemExit(
+            f"TIINGO_API_KEY not set.\n"
+            f"Add it to {ENV_PATH} as:\n"
+            f"    TIINGO_API_KEY=your_key_here"
+        )
+    return token
+
+
+# --- fetch ----------------------------------------------------------------
+
+
+def _session(token: str) -> requests.Session:
+    s = requests.Session()
+    s.headers.update({
+        "Content-Type": "application/json",
+        "Authorization": f"Token {token}",
+    })
+    return s
+
+
+def fetch(
+    session: requests.Session,
+    ticker: str,
+    start: str = START_DATE,
+    end: str | None = None,
+) -> pd.DataFrame:
+    """Fetch daily bars for one ticker."""
+    params = {"startDate": start, "format": "json"}
+    if end:
+        params["endDate"] = end
+
+    resp = session.get(f"{BASE_URL}/{ticker}/prices", params=params, timeout=TIMEOUT)
+
+    if resp.status_code == 404:
+        raise RuntimeError(f"{ticker}: not found on Tiingo")
+    if resp.status_code == 429:
+        raise RuntimeError("rate limited -- back off and retry")
+    resp.raise_for_status()
+
+    rows = resp.json()
+    if not rows:
+        return pd.DataFrame(columns=COLUMNS)
+
+    df = pd.DataFrame(rows)
+    df["date"] = pd.to_datetime(df["date"], utc=True).dt.tz_localize(None).dt.normalize()
+    df = df.set_index("date").sort_index()
+
+    missing = [c for c in COLUMNS if c not in df.columns]
+    if missing:
+        raise RuntimeError(f"{ticker}: response missing {missing}")
+
+    return df[COLUMNS]
+
+
+def update_ticker(
+    session: requests.Session,
+    ticker: str,
+    full: bool = False,
+) -> pd.DataFrame:
+    """Fetch or incrementally extend one ticker's history.
+
+    Tiingo back-adjusts historical prices when a dividend or split occurs,
+    so if the incremental slice contains a corporate action the cached
+    adjusted series is stale and the whole history has to be refetched.
+    """
+    path = DATA_DIR / f"{ticker}.parquet"
+
+    if full or not path.exists():
+        df = fetch(session, ticker)
+        df.to_parquet(path)
+        log.info("%-5s full   %5d bars  %s -> %s",
+                 ticker, len(df), df.index[0].date(), df.index[-1].date())
+        return df
+
+    cached = pd.read_parquet(path)
+    resume = (cached.index[-1] + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    if resume > date.today().isoformat():
+        log.info("%-5s up to date (%s)", ticker, cached.index[-1].date())
+        return cached
+
+    delta = fetch(session, ticker, start=resume)
+    if delta.empty:
+        log.info("%-5s no new bars", ticker)
+        return cached
+
+    corporate_action = (delta["divCash"] > 0).any() or (delta["splitFactor"] != 1).any()
+    if corporate_action:
+        log.info("%-5s corporate action in delta -- refetching full history", ticker)
+        df = fetch(session, ticker)
+        df.to_parquet(path)
+        return df
+
+    df = pd.concat([cached, delta])
+    df = df[~df.index.duplicated(keep="last")].sort_index()
+    df.to_parquet(path)
+    log.info("%-5s +%-4d bars  through %s", ticker, len(delta), df.index[-1].date())
+    return df
+
+
+def build_panel(frames: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """Wide panel: columns are (ticker, field)."""
+    keyed = {t: df for t, df in frames.items() if not df.empty}
+    return pd.concat(keyed.values(), axis=1, keys=keyed.keys()).sort_index()
+
+
+# --- entry point ----------------------------------------------------------
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Fetch EOD data from Tiingo.")
+    parser.add_argument("--full", action="store_true",
+                        help="refetch complete history, ignoring cache")
+    parser.add_argument("--tickers", nargs="*", default=UNIVERSE,
+                        help="override the default universe")
+    args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(message)s")
+
+    token = load_token()
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    session = _session(token)
+
+    frames: dict[str, pd.DataFrame] = {}
+    for i, ticker in enumerate(args.tickers):
+        if i:
+            time.sleep(PACING_SECONDS)
+        try:
+            frames[ticker] = update_ticker(session, ticker, full=args.full)
+        except Exception as exc:  # noqa: BLE001
+            log.error("%-5s FAILED: %s", ticker, exc)
+
+    if not frames:
+        raise SystemExit("nothing fetched")
+
+    panel = build_panel(frames)
+    panel.to_parquet(DATA_DIR / "panel.parquet")
+
+    closes = panel.xs("adjClose", axis=1, level=1)
+    print("\ninception dates:")
+    print(closes.apply(lambda s: s.first_valid_index()).sort_values().to_string())
+    print(f"\ncommon sample starts: {closes.dropna().index[0].date()}")
+    print(f"rows: {len(closes)}   written to: {DATA_DIR}")
+
+
+if __name__ == "__main__":
+    main()
