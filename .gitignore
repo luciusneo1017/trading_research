@@ -13,10 +13,7 @@ wheels/
 # Jupyter
 .ipynb_checkpoints/
 
-# Data
-data/raw/
-data/shared_processed/
-**/data/processed/
+
 
 # OS files
 .DS_Store

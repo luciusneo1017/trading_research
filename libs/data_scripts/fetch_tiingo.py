@@ -1,25 +1,31 @@
 """
 Tiingo end-of-day fetcher.
 
-Location:  trend_following/data/scripts/fetch_tiingo.py
-Output:    trend_following/data/<TICKER>.parquet
-           trend_following/data/panel.parquet
-Config:    trend_following/.env
+Location:  repos/trading_research/data_scripts/fetch_tiingo.py
+Config:    repos/trading_research/.env
+Output:    repos/data/tiingo/<TICKER>.parquet
+           repos/data/tiingo/panel.parquet
+
+The data store lives outside the repo so that several strategy packages can
+read the same panel without either duplicating it or committing a few hundred
+megabytes of parquet to git history. Its location is read from TIINGO_DATA_DIR
+and falls back to a sibling `data/tiingo` directory next to the repo.
 
 Stores raw OHLCV alongside adjusted OHLCV and the corporate-action columns
 (divCash, splitFactor) so adjustments stay reproducible: you can always
 rebuild an adjusted series from the raw one, but not the reverse.
 
 Setup:
-    pip install requests pandas pyarrow python-dotenv
+    uv add requests pandas pyarrow python-dotenv
 
-    # trend_following/.env
+    # repos/trading_research/.env
     TIINGO_API_KEY=your_key_here
+    TIINGO_DATA_DIR=C:/Users/luciu/repos/data/tiingo/commods
 
 Usage:
-    python fetch_tiingo.py              # incremental update
-    python fetch_tiingo.py --full       # force full refetch
-    python fetch_tiingo.py --tickers GLD SLV
+    uv run python data_scripts/fetch_tiingo.py             # incremental update
+    uv run python data_scripts/fetch_tiingo.py --full      # force full refetch
+    uv run python data_scripts/fetch_tiingo.py --tickers GLD SLV
 """
 
 from __future__ import annotations
@@ -38,13 +44,13 @@ from dotenv import load_dotenv
 log = logging.getLogger("tiingo")
 
 # --- paths ----------------------------------------------------------------
-# this file:  <root>/data/scripts/fetch_tiingo.py
-#   parents[0] = <root>/data/scripts
-#   parents[1] = <root>/data
-#   parents[2] = <root>
-DATA_DIR = Path(__file__).resolve().parents[1]
-ROOT_DIR = Path(__file__).resolve().parents[2]
-ENV_PATH = ROOT_DIR / ".env"
+# this file:  repos/trading_research/data_scripts/fetch_tiingo.py
+#   parents[0] = repos/trading_research/data_scripts
+#   parents[1] = repos/trading_research      <- repo root, holds .env
+#   parents[2] = repos                       <- data/ sits alongside the repo
+REPO_DIR = Path(__file__).resolve().parents[1]
+ENV_PATH = REPO_DIR / ".env"
+DEFAULT_DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "tiingo" / "commods"
 
 # --- config ---------------------------------------------------------------
 
@@ -74,15 +80,16 @@ COLUMNS = [
 ]
 
 
-# --- credentials ----------------------------------------------------------
+# --- environment ----------------------------------------------------------
 
 
-def load_token() -> str:
-    """Read TIINGO_API_KEY, preferring an already-exported shell variable.
+def load_env() -> None:
+    """Load the repo-root .env.
 
     load_dotenv is given an explicit path rather than relying on its upward
     search, which starts from the current working directory and therefore
     breaks whenever the script is invoked from somewhere other than the root.
+    Variables already exported in the shell win, which is the sensible default.
     """
     if ENV_PATH.exists():
         load_dotenv(ENV_PATH)
@@ -90,6 +97,8 @@ def load_token() -> str:
     else:
         log.warning("no .env found at %s", ENV_PATH)
 
+
+def resolve_token() -> str:
     token = os.environ.get("TIINGO_API_KEY")
     if not token:
         raise SystemExit(
@@ -98,6 +107,12 @@ def load_token() -> str:
             f"    TIINGO_API_KEY=your_key_here"
         )
     return token
+
+
+def resolve_data_dir(override: str | None = None) -> Path:
+    """Data store location: CLI flag, then TIINGO_DATA_DIR, then the default."""
+    raw = override or os.environ.get("TIINGO_DATA_DIR")
+    return Path(raw).expanduser().resolve() if raw else DEFAULT_DATA_DIR
 
 
 # --- fetch ----------------------------------------------------------------
@@ -149,6 +164,7 @@ def fetch(
 def update_ticker(
     session: requests.Session,
     ticker: str,
+    data_dir: Path,
     full: bool = False,
 ) -> pd.DataFrame:
     """Fetch or incrementally extend one ticker's history.
@@ -157,7 +173,7 @@ def update_ticker(
     so if the incremental slice contains a corporate action the cached
     adjusted series is stale and the whole history has to be refetched.
     """
-    path = DATA_DIR / f"{ticker}.parquet"
+    path = data_dir / f"{ticker}.parquet"
 
     if full or not path.exists():
         df = fetch(session, ticker)
@@ -192,10 +208,6 @@ def update_ticker(
     return df
 
 
-def build_panel(frames: dict[str, pd.DataFrame]) -> pd.DataFrame:
-    """Wide panel: columns are (ticker, field)."""
-    keyed = {t: df for t, df in frames.items() if not df.empty}
-    return pd.concat(keyed.values(), axis=1, keys=keyed.keys()).sort_index()
 
 
 # --- entry point ----------------------------------------------------------
@@ -207,12 +219,18 @@ def main() -> None:
                         help="refetch complete history, ignoring cache")
     parser.add_argument("--tickers", nargs="*", default=UNIVERSE,
                         help="override the default universe")
+    parser.add_argument("--data-dir", default=None,
+                        help="override TIINGO_DATA_DIR for this run")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(message)s")
 
-    token = load_token()
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    load_env()
+    token = resolve_token()
+    data_dir = resolve_data_dir(args.data_dir)
+    data_dir.mkdir(parents=True, exist_ok=True)
+    log.info("data store: %s", data_dir)
+
     session = _session(token)
 
     frames: dict[str, pd.DataFrame] = {}
@@ -220,21 +238,14 @@ def main() -> None:
         if i:
             time.sleep(PACING_SECONDS)
         try:
-            frames[ticker] = update_ticker(session, ticker, full=args.full)
+            frames[ticker] = update_ticker(session, ticker, data_dir, full=args.full)
         except Exception as exc:  # noqa: BLE001
             log.error("%-5s FAILED: %s", ticker, exc)
 
     if not frames:
         raise SystemExit("nothing fetched")
 
-    panel = build_panel(frames)
-    panel.to_parquet(DATA_DIR / "panel.parquet")
 
-    closes = panel.xs("adjClose", axis=1, level=1)
-    print("\ninception dates:")
-    print(closes.apply(lambda s: s.first_valid_index()).sort_values().to_string())
-    print(f"\ncommon sample starts: {closes.dropna().index[0].date()}")
-    print(f"rows: {len(closes)}   written to: {DATA_DIR}")
 
 
 if __name__ == "__main__":
