@@ -44,13 +44,14 @@ from dotenv import load_dotenv
 log = logging.getLogger("tiingo")
 
 # --- paths ----------------------------------------------------------------
-# this file:  repos/trading_research/data_scripts/fetch_tiingo.py
-#   parents[0] = repos/trading_research/data_scripts
-#   parents[1] = repos/trading_research      <- repo root, holds .env
-#   parents[2] = repos                       <- data/ sits alongside the repo
-REPO_DIR = Path(__file__).resolve().parents[1]
+# this file:  repos/trading_research/libs/data_scripts/fetch_tiingo.py
+#   parents[0] = repos/trading_research/libs/data_scripts
+#   parents[1] = repos/trading_research/libs     
+#   parents[2] = repos/trading_research     <- repo root, holds .env
+#   parents[3] = repos/                       <- data/ sits alongside the repo
+REPO_DIR = Path(__file__).resolve().parents[2]
 ENV_PATH = REPO_DIR / ".env"
-DEFAULT_DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "tiingo" / "commods"
+DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "tiingo" / "commods"
 
 # --- config ---------------------------------------------------------------
 
