@@ -8,8 +8,17 @@ IR = TC * IC * sqrt(BR)
 
 Neff?
 
-(Fast ma log price - slow ma log price)/vol
 
+
+(Fast ma log price - slow ma log price)/vol;
+fast ma log price : 3m
+slow ma log price: 6m
+assuming 252 trading days (periods) a year; price data collected at daily freq, 1 period = 1 day
+3m = 252 * 0.25 = 63
+6m = 126
+
+lets define trend as start of trend, trend continuation, trend reversal
+Relatinonship btw choice of fast ma and slow ma + their interaction  and stage in trend cycle?
 trend horizon: 1m - 12m ; avg 3-6m
 
 trend signal passes through function to map signal to target risk allocation for that market, allocation should cap out at some point ; maps trend strength to target exposure
